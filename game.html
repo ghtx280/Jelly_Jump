@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+<title>JellyJump</title>
+
+<style>
+    
+    *{margin: 0; user-select: none;}
+    
+    body{
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .scene{
+
+        width: 700px;
+        height: 280px;
+        border-bottom: 30px solid rgb(50, 50, 50);
+        background: #F1F1F1;
+        overflow: hidden;
+    }
+
+    .score{
+        position: relative;
+        top: 10px;
+        left: 10px;
+        width: 0;
+        height: 0;
+    }
+
+    .num, .rec, .cs{
+        color:black;
+        font-size: 18px;
+        font-family: sans-serif;
+    }
+    .lose h1{
+        color:black;
+        font-size: 36px;
+        font-family: sans-serif;
+        margin-bottom: 10px;
+    }
+    .lose p{
+        color:white;
+        font-size: 28px;
+        font-family: sans-serif;
+        padding: 20px;
+        background: rgb(67, 165, 97);
+    }
+
+    .lose {
+
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        z-index: 1;
+        width: 700px;
+        height: 310px;
+        background: rgba(255, 255, 255, 0.5);
+
+    }
+
+    #player{
+        position: relative;
+        top: 250px;
+        left: 70px;
+        width: 30px;
+        height: 30px;
+        transform-origin: bottom center;
+        background: #7087FF;
+    }
+
+    #enemy{
+        position: relative;
+        width: 30px;
+        height: 30px;
+        left: 500px;
+        top: 220px;
+        border-radius: 50%;
+        background: #FF7272;
+    }
+
+    .jump{
+        animation: jump 1s linear;
+    }
+    
+    @keyframes jump {
+        0%{  top: 250px; transform: scale(1, 1);}
+        10%{ top: 250px; transform: scale(1.5, 0.5);}
+        20%{ top: 250px; transform: scale(1, 1);}
+
+        30%{ top: 215px; transform: scale(0.5, 1.5);}
+        40%{ top: 180px; transform: scale(1, 1);}
+        50%{ top: 155px; transform: scale(1.5, 0.5);}
+        60%{ top: 180px; transform: scale(1, 1);}
+
+        70%{ top: 250px; transform: scale(1, 1);}
+        80%{ top: 250px; transform: scale(1.5, 0.5);}
+        100%{top: 250px; transform: scale(1, 1);}
+    }
+
+</style>
+</head>
+
+<body>
+
+    <div class="scene" >
+        <div class="score">
+            <p class="num">РАХУНОК:0</p> 
+            <p class="rec">РЕКОРД:0</p>
+            <p class="cs"></p>
+        </div>
+        <div id="player"></div>
+        <div id="enemy"></div>
+    </div>
+    <div class="lose">
+        <h1>ТИ ПРОГРАВ!</h1>
+        <p>ГРАТИ ЗНОВУ</p>
+    </div>
+    
+<script>
+
+    var scene  = $('.scene')
+    var enemy  = $('#enemy')
+    var player = $('#player')
+    var num    = $('.num')
+    var rec    = $('.rec')
+    var dead   = false;
+    var posX   = scene.width()
+    var speed  = 5
+    var score  = 0 
+    var max    = localStorage.getItem('max')
+
+
+    if(max == null){
+        max = 0
+        localStorage.setItem('max', max)
+    }
+
+    rec.text('РЕКОРД:' + max)
+
+    function update() {
+
+
+        posY = Math.floor(player.offset().top) 
+
+        enemy.css('left', posX)
+        posX -= speed
+
+        if(enemy.offset().left < ($('body').width() - scene.width()) / 2 - 100){
+            score++
+            speed += 0.1
+            num.text('РАХУНОК:' + score)
+            posX = scene.width()
+            
+        }
+        if(dead == false) {
+            if(posX < 90 && posX > 80 ){
+                if(posY > 440){
+                    console.log('dead')
+                    $('.lose').css('display', 'flex')
+                    score = 0
+                    speed = 5
+                    num.text('РАХУНОК:' + score)
+                    posX = scene.width() + 100
+                    dead = true 
+        }}}
+        else{
+            setTimeout(function(){ dead = false }, 100)
+        }
+
+
+        if(max < score){
+            max = score
+            rec.text('РЕКОРД:' + max)
+            localStorage.setItem('max', max)
+        }
+    
+    } setInterval(update, 16)
+
+
+
+    
+    $('.scene').mousedown(function(){
+        if(player.hasClass('jump') == false){
+            player.addClass('jump') 
+            setTimeout(function(){player.removeClass('jump')}, 1000) 
+        } 
+    })
+    $('.lose p').click(function(){
+        location.reload()
+    })
+    
+</script>
+</body>
+</html>
